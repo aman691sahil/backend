@@ -8,17 +8,17 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const Redis = require("ioredis");
+// const Redis = require("ioredis");
 const { generateRandomCards } = require("../utils");
-const redis = new Redis({
+// const redis = new Redis({
   
-});
+// });
 
 const server = http.createServer(app);
 const io = socketIO(server);
 
 const getLatestLeaderboard = async () => {
-  const leaderboard = await redis.zrevrange("leaderboard", 0, -1, "WITHSCORES");
+  // const leaderboard = await redis.zrevrange("leaderboard", 0, -1, "WITHSCORES");
   const formatedLeaderboard = [];
   // formatting into the required format
   for (let i = 0; i < leaderboard.length; i += 2) {
@@ -44,23 +44,23 @@ app.get("/game", async (req, res) => {
     const { userName } = req.query;
 
     // Check if the member already exists
-    let isMember = await redis.exists(userName);
+    // let isMember = await redis.exists(userName);
 
     // Initialize the game for the new user
     if (!isMember && userName) {
       const randomCards = generateRandomCards();
-      await redis.hmset(
-        userName,
-        "score",
-        0,
-        "gameCards",
-        JSON.stringify(randomCards),
-        "hasDefuseCard",
-        "false",
-        "activeCard",
-        null
-      );
-      redis.zadd("leaderboard", 0, userName);
+      // await redis.hmset(
+      //   userName,
+      //   "score",
+      //   0,
+      //   "gameCards",
+      //   JSON.stringify(randomCards),
+      //   "hasDefuseCard",
+      //   "false",
+      //   "activeCard",
+      //   null
+      // );
+      // redis.zadd("leaderboard", 0, userName);
     }
 
     // Get game state from Redis
@@ -90,19 +90,19 @@ app.put("/game", async (req, res) => {
     const gameCards = req.body.gameCards
       ? req.body.gameCards
       : generateRandomCards();
-    insertGame = await redis.hmset(
-      userName,
-      "gameCards",
-      JSON.stringify(gameCards),
-      "hasDefuseCard",
-      hasDefuseCard,
-      "activeCard",
-      activeCard,
-      "score",
-      score
-    );
+    // insertGame = await redis.hmset(
+    //   userName,
+    //   "gameCards",
+    //   JSON.stringify(gameCards),
+    //   "hasDefuseCard",
+    //   hasDefuseCard,
+    //   "activeCard",
+    //   activeCard,
+    //   "score",
+    //   score
+    // );
     // Update the score of the user
-    redis.zadd("leaderboard", score, userName);
+    // redis.zadd("leaderboard", score, userName);
 
     // Emit the latest leaderboard
     const leaderboardLatest = await getLatestLeaderboard();
@@ -119,17 +119,17 @@ app.delete("/game", async (req, res) => {
   try {
     const { userName } = req.body;
     const emptyArray = [];
-    insertGame = await redis.hmset(
-      userName,
-      "gameCards",
-      emptyArray,
-      "hasDefuseCard",
-      "false",
-      "activeCard",
-      null
-    );
-    const score = redis.hget(userName, "score");
-    redis.zadd("leaderboard", score, userName);
+    // insertGame = await redis.hmset(
+    //   userName,
+    //   "gameCards",
+    //   emptyArray,
+    //   "hasDefuseCard",
+    //   "false",
+    //   "activeCard",
+    //   null
+    // );
+    // const score = redis.hget(userName, "score");
+    // redis.zadd("leaderboard", score, userName);
 
     // Emit the latest leaderboard
     const leaderboardLatest = await getLatestLeaderboard();
